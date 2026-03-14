@@ -464,9 +464,12 @@ function updateHistory(d) {
 function fmtVND(n) {
   return Number(n).toLocaleString('vi-VN') + ' đ';
 }
-function fmtPct(v) {
-  const num = parseFloat(v);
-  return (num < 1 ? (num * 100).toFixed(1) : num.toFixed(1)) + '%';
+// function fmtPct(v) {
+//   const num = parseFloat(v);
+//   return (num < 1 ? (num * 100).toFixed(1) : num.toFixed(1)) + '%';
+// }
+  function fmtPct(v) {
+  return v;
 }
 
 // ── Enter key ────────────────────────────────────
