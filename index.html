@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Tra cứu nội bộ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue: #2481cc;
+    --blue-light: #e8f4ff;
+    --blue-mid: #b3d4f5;
+    --green: #0f9e6e;
+    --green-light: #e1f7ef;
+    --red: #e24b4a;
+    --red-light: #fdf0f0;
+    --bg: #f0f2f5;
+    --surface: #ffffff;
+    --surface2: #f7f8fa;
+    --border: rgba(0,0,0,0.08);
+    --text: #1a1a2e;
+    --text2: #6b7280;
+    --text3: #9ca3af;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a2e;
+      --surface: #242438;
+      --surface2: #1e1e30;
+      --border: rgba(255,255,255,0.08);
+      --text: #f0f0f8;
+      --text2: #9ca3af;
+      --text3: #6b7280;
+      --blue-light: rgba(36,129,204,0.15);
+      --green-light: rgba(15,158,110,0.15);
+      --red-light: rgba(226,75,74,0.12);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); font-family: 'Be Vietnam Pro', sans-serif; color: var(--text); }
+
+  /* HEADER */
+  .header {
+    background: var(--blue);
+    padding: 14px 16px 12px;
+    display: flex; align-items: center; gap: 10px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff;
+  }
+  .header-title { font-size: 15px; font-weight: 600; color: #fff; }
+  .header-sub { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 1px; }
+
+  /* NAV */
+  .nav {
+    display: flex; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 62px; z-index: 9;
+  }
+  .nav-btn {
+    flex: 1; padding: 10px 4px 8px; border: none; background: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 11px; color: var(--text2); font-family: inherit;
+    border-bottom: 2px solid transparent; transition: color 0.2s;
+  }
+  .nav-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .nav-icon { font-size: 18px; }
+
+  /* CONTENT */
+  .content { padding: 16px; padding-bottom: 32px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* SEARCH */
+  .search-wrap {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 10px 12px; gap: 8px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .search-wrap input {
+    flex: 1; border: none; background: none;
+    font-size: 15px; color: var(--text); outline: none;
+    font-family: inherit;
+  }
+  .search-wrap input::placeholder { color: var(--text3); }
+  .search-btn {
+    background: var(--blue); color: #fff; border: none;
+    border-radius: var(--radius-sm); padding: 7px 16px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: inherit; transition: opacity 0.15s;
+  }
+  .search-btn:active { opacity: 0.8; }
+
+  /* RESULT CARD */
+  .result-card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    display: none; animation: fadeIn 0.25s ease;
+  }
+  .result-card.show { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+
+  .result-top {
+    background: linear-gradient(135deg, var(--blue) 0%, #1a6db5 100%);
+    padding: 16px; display: flex; align-items: center; gap: 12px;
+  }
+  .result-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 600; color: #fff;
+  }
+  .result-name { font-size: 16px; font-weight: 600; color: #fff; }
+  .result-id-badge {
+    display: inline-block; background: rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 2px 10px;
+    font-size: 11px; color: rgba(255,255,255,0.9); margin-top: 4px;
+  }
+  .status-dot {
+    margin-left: auto; display: flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 10px;
+    font-size: 11px; color: #fff;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
+
+  .result-body { padding: 4px 0; }
+  .result-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 16px; border-bottom: 1px solid var(--border);
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-label { font-size: 13px; color: var(--text2); }
+  .result-val { font-size: 13px; font-weight: 500; color: var(--text); }
+  .result-val.green { color: var(--green); }
+
+  /* EMPTY */
+  .empty {
+    text-align: center; padding: 48px 20px;
+    color: var(--text3); font-size: 14px;
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-hint { font-size: 12px; color: var(--text3); margin-top: 6px; }
+
+  /* ERROR */
+  .error-box {
+    background: var(--red-light); border: 1px solid rgba(226,75,74,0.2);
+    border-radius: var(--radius); padding: 14px 16px; display: none;
+    animation: fadeIn 0.2s ease;
+  }
+  .error-box.show { display: flex; align-items: center; gap: 10px; }
+  .error-box span { font-size: 13px; color: var(--red); }
+
+  /* METRICS */
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .metric-card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .metric-icon { font-size: 20px; margin-bottom: 6px; }
+  .metric-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+  .metric-val { font-size: 18px; font-weight: 600; color: var(--text); }
+  .metric-val.blue { color: var(--blue); }
+  .metric-val.green { color: var(--green); }
+
+  .section-title {
+    font-size: 12px; font-weight: 600; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;
+  }
+  .chart-wrap {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    position: relative; height: 220px;
+  }
+
+  /* HISTORY */
+  .history-item {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 13px 14px;
+    margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    animation: fadeIn 0.2s ease;
+  }
+  .history-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .history-date { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .history-amount { font-size: 14px; font-weight: 600; color: var(--green); }
+  .history-pct {
+    display: inline-block; background: var(--green-light);
+    border-radius: 20px; padding: 2px 8px;
+    font-size: 11px; color: var(--green); margin-top: 4px;
+  }
+
+  /* LOADING */
+  .loading {
+    display: none; text-align: center; padding: 32px;
+    color: var(--text2); font-size: 13px;
+  }
+  .loading.show { display: block; }
+  .spinner {
+    width: 28px; height: 28px; border: 3px solid var(--border);
+    border-top-color: var(--blue); border-radius: 50%;
+    animation: spin 0.7s linear infinite; margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-avatar">NB</div>
+  <div>
+    <div class="header-title">Tra cứu nội bộ</div>
+    <div class="header-sub">Mini App · Nhân viên</div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="switchTab('lookup', this)">
+    <span class="nav-icon">🔍</span>Tra cứu
+  </button>
+  <button class="nav-btn" onclick="switchTab('dashboard', this)">
+    <span class="nav-icon">📊</span>Dashboard
+  </button>
+  <button class="nav-btn" onclick="switchTab('history', this)">
+    <span class="nav-icon">📋</span>Lịch sử
+  </button>
+</div>
+
+<div class="content">
+
+  <!-- TAB: TRA CỨU -->
+  <div class="screen active" id="screen-lookup">
+    <div class="search-wrap">
+      <input type="number" id="searchInput" placeholder="Nhập ID của bạn..." inputmode="numeric" />
+      <button class="search-btn" onclick="doSearch()">Tìm</button>
+    </div>
+
+    <div class="loading" id="loadingState">
+      <div class="spinner"></div>
+      Đang tra cứu...
+    </div>
+
+    <div class="error-box" id="errorBox">
+      <span style="font-size:18px">❌</span>
+      <span id="errorMsg">Không tìm thấy ID này.</span>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-top">
+        <div class="result-avatar" id="resAvatar">NV</div>
+        <div>
+          <div class="result-name" id="resName">-</div>
+          <span class="result-id-badge" id="resIdBadge">ID: -</span>
+        </div>
+        <div class="status-dot"><span class="dot"></span>Active</div>
+      </div>
+      <div class="result-body">
+        <div class="result-row">
+          <span class="result-label">📅 Ngày</span>
+          <span class="result-val" id="resDate">-</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">💰 Tổng nhập</span>
+          <span class="result-val" id="resTong">-</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">📊 Tỉ lệ %</span>
+          <span class="result-val" id="resPct">-</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">💵 Lợi nhuận</span>
+          <span class="result-val green" id="resLoi">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty" id="emptyState">
+      <div class="empty-icon">🔍</div>
+      <div>Nhập ID để tra cứu</div>
+      <div class="empty-hint">Thông tin chỉ hiển thị cho đúng ID của bạn</div>
+    </div>
+  </div>
+
+  <!-- TAB: DASHBOARD -->
+  <div class="screen" id="screen-dashboard">
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-icon">💰</div>
+        <div class="metric-label">Tổng nhập</div>
+        <div class="metric-val blue" id="dbTong">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">📈</div>
+        <div class="metric-label">Lợi nhuận</div>
+        <div class="metric-val green" id="dbLoi">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">📊</div>
+        <div class="metric-label">Tỉ lệ %</div>
+        <div class="metric-val" id="dbPct">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">📅</div>
+        <div class="metric-label">Ngày GD</div>
+        <div class="metric-val" id="dbDate" style="font-size:13px">—</div>
+      </div>
+    </div>
+    <div class="section-title">Lợi nhuận theo tháng</div>
+    <div class="chart-wrap">
+      <canvas id="chartLoi"></canvas>
+    </div>
+  </div>
+
+  <!-- TAB: LỊCH SỬ -->
+  <div class="screen" id="screen-history">
+    <div class="section-title">Giao dịch gần đây</div>
+    <div id="historyList">
+      <div class="empty">
+        <div class="empty-icon">📋</div>
+        <div>Chưa có dữ liệu</div>
+        <div class="empty-hint">Tra cứu ID để tải lịch sử</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// ⚙️  CẤU HÌNH — chỉ sửa phần này
+// ═══════════════════════════════════════════════════
+const GAS_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+// ═══════════════════════════════════════════════════
+
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+let chart = null;
+let lastData = null;
+
+// ── Tab switching ────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Search ───────────────────────────────────────
+async function doSearch() {
+  const id = document.getElementById('searchInput').value.trim();
+  if (!id) return;
+
+  showState('loading');
+
+  try {
+    const res = await fetch(`${GAS_URL}?id=${encodeURIComponent(id)}`);
+    const json = await res.json();
+
+    if (json.found) {
+      lastData = json;
+      renderResult(json);
+      updateDashboard(json);
+      updateHistory(json);
+      showState('result');
+    } else {
+      showState('error', json.message || `Không tìm thấy ID ${id}`);
+    }
+  } catch (err) {
+    showState('error', 'Lỗi kết nối. Vui lòng thử lại.');
+  }
+}
+
+function showState(state, msg) {
+  document.getElementById('loadingState').classList.toggle('show', state === 'loading');
+  document.getElementById('resultCard').classList.toggle('show', state === 'result');
+  document.getElementById('errorBox').classList.toggle('show', state === 'error');
+  document.getElementById('emptyState').style.display = state === 'empty' ? 'block' : 'none';
+  if (state === 'error') document.getElementById('errorMsg').textContent = msg || '';
+}
+
+// ── Render result card ───────────────────────────
+function renderResult(d) {
+  const initials = d.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase();
+  document.getElementById('resAvatar').textContent = initials;
+  document.getElementById('resName').textContent = d.name;
+  document.getElementById('resIdBadge').textContent = 'ID: ' + d.id;
+  document.getElementById('resDate').textContent = d.date;
+  document.getElementById('resTong').textContent = fmtVND(d.tong_nhap);
+  document.getElementById('resPct').textContent = fmtPct(d.phanTram);
+  document.getElementById('resLoi').textContent = '+' + fmtVND(d.loi_nhuan);
+}
+
+// ── Dashboard ────────────────────────────────────
+function updateDashboard(d) {
+  document.getElementById('dbTong').textContent = fmtVND(d.tong_nhap);
+  document.getElementById('dbLoi').textContent = fmtVND(d.loi_nhuan);
+  document.getElementById('dbPct').textContent = fmtPct(d.phanTram);
+  document.getElementById('dbDate').textContent = d.date;
+
+  const months = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
+  const mockMonthly = months.map(() => Math.round(d.loi_nhuan * (0.6 + Math.random() * 0.8)));
+
+  if (chart) { chart.destroy(); }
+  chart = new Chart(document.getElementById('chartLoi'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [{
+        data: mockMonthly,
+        backgroundColor: months.map((_, i) => i === new Date().getMonth() ? '#2481cc' : '#b3d4f5'),
+        borderRadius: 5, borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => fmtVND(ctx.raw) }
+      }},
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#9ca3af' } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: {
+          font: { size: 10 }, color: '#9ca3af',
+          callback: v => (v >= 1000 ? Math.round(v/1000) + 'k' : v)
+        }}
+      }
+    }
+  });
+}
+
+// ── History ──────────────────────────────────────
+function updateHistory(d) {
+  const list = document.getElementById('historyList');
+  list.innerHTML = `
+    <div class="history-item">
+      <div>
+        <div class="history-name">${d.name}</div>
+        <div class="history-date">${d.date} · ID: ${d.id}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="history-amount">+${fmtVND(d.loi_nhuan)}</div>
+        <span class="history-pct">${fmtPct(d.phanTram)}</span>
+      </div>
+    </div>
+  `;
+}
+
+// ── Helpers ──────────────────────────────────────
+function fmtVND(n) {
+  return Number(n).toLocaleString('vi-VN') + ' đ';
+}
+function fmtPct(v) {
+  const num = parseFloat(v);
+  return (num < 1 ? (num * 100).toFixed(1) : num.toFixed(1)) + '%';
+}
+
+// ── Enter key ────────────────────────────────────
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+// ── Telegram theme sync ──────────────────────────
+if (tg?.colorScheme === 'dark') {
+  document.documentElement.style.setProperty('--bg', '#1a1a2e');
+}
+</script>
+</body>
+</html>
