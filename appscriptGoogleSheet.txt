@@ -1,0 +1,129 @@
+const BOT_TOKEN  = "8779981142:AAF366TtBQHLfqQxD0iQiVINZHZeg-u2COQ";
+const SHEET_NAME = "sheet1"; // ← sửa đúng tên tab sheet của bạn
+
+function doGet(e) {
+  const id = e.parameter.id;
+  const callback = e.parameter.callback;
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+
+  let result = { found: false, message: "Không tìm thấy ID " + id };
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    if (row[0].toString().trim() === id.toString().trim()) {
+      result = {
+        found:     true,
+        id:        row[0],
+        name:      row[1],
+        date:      Utilities.formatDate(new Date(row[2]), Session.getScriptTimeZone(), "dd/MM/yyyy"),
+        tong_nhap: row[3],
+        phanTram:  row[4],
+        loi_nhuan: row[5]
+      };
+      break;
+    }
+  }
+
+  const json = JSON.stringify(result);
+  return callback
+    ? ContentService.createTextOutput(`${callback}(${json})`).setMimeType(ContentService.MimeType.JAVASCRIPT)
+    : ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
+}
+function doPost(e) {
+  try {
+    const update  = JSON.parse(e.postData.contents);
+    const message = update.message;
+
+    if (!message || !message.text) return ContentService.createTextOutput("ok");
+    if (message.chat.type !== "private") return ContentService.createTextOutput("ok");
+
+    const chatId = message.chat.id;
+    const text   = message.text.trim();
+
+    // Chỉ xử lý /start, bỏ qua tất cả tin nhắn khác
+    if (text === "/start") {
+      sendMessage(chatId, "👋 Bấm nút *Tra cứu* bên dưới để mở Mini App.");
+    }
+
+  } catch(err) { Logger.log(err); }
+  return ContentService.createTextOutput("ok");
+}
+
+// function doPost(e) {
+//   try {
+//     const update  = JSON.parse(e.postData.contents);
+//     const message = update.message;
+//     if (!message || !message.text) return ContentService.createTextOutput("ok");
+//     const chatId = message.chat.id;
+//     const text   = message.text.trim();
+//     if (message.chat.type !== "private") return ContentService.createTextOutput("ok");
+//     let reply = "";
+//     if (text === "/start") {
+//       reply = "👋 Nhập *ID* của bạn để tra cứu.\nHoặc mở Mini App bên dưới 👇";
+//     } else if (/^\d+$/.test(text)) {
+//       reply = lookupById(text);
+//     } else {
+//       reply = "⚠️ Vui lòng nhập *ID* là số. Ví dụ: `1`";
+//     }
+//     sendMessage(chatId, reply);
+//   } catch(err) { Logger.log(err); }
+//   return ContentService.createTextOutput("ok");
+// }
+
+function lookupById(inputId) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data  = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    if (row[0].toString().trim() === inputId.trim()) {
+      const date     = Utilities.formatDate(new Date(row[2]), Session.getScriptTimeZone(), "dd/MM/yyyy");
+      const tongNhap = Number(row[3]).toLocaleString("vi-VN");
+      // const phanTram = (Number(row[4]) * 100).toFixed(1) + "%";
+      const phanTram = row[4].toString();
+      const loiNhuan = Number(row[5]).toLocaleString("vi-VN");
+      return `✅ *Thông tin của bạn*\n\n👤 *Tên:* ${row[1]}\n🆔 *ID:* ${row[0]}\n📅 *Ngày:* ${date}\n💰 *Tổng nhập:* ${tongNhap} đ\n📊 *Tỉ lệ:* ${phanTram}\n💵 *Lợi nhuận:* ${loiNhuan} đ`;
+    }
+  }
+  return `❌ Không tìm thấy ID *${inputId}*.`;
+}
+
+function sendMessage(chatId, text) {
+  UrlFetchApp.fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: "post", contentType: "application/json",
+    payload: JSON.stringify({ chat_id: chatId, text: text, parse_mode: "Markdown" })
+  });
+}
+
+function deleteWebhook() {
+  const res = UrlFetchApp.fetch(`https://api.telegram.org/bot${BOT_TOKEN}/deleteWebhook`);
+  Logger.log(res.getContentText());
+}
+
+function setWebhook() {
+  const webAppUrl = "https://script.google.com/macros/s/AKfycbySB2saHgaUk8v1T9ERnpFt3zwy29a2gf_5SjZHCM2yZ2AtcH5ECnuM1vwnwYea_1J-/exec";
+  const res = UrlFetchApp.fetch(`https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${webAppUrl}`);
+  Logger.log(res.getContentText());
+}
+ // đăng bài tự động lên kênh
+ function dangBaiKennh() {
+  const CHANNEL_ID = "-1003783459347";
+  
+  UrlFetchApp.fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify({
+      chat_id: CHANNEL_ID,
+      text: "👋 *Chào mừng đến kênh nội bộ Pay99!*\n\n📌 Bấm nút bên dưới để truy vấn tiền lương.",
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [[
+          {
+            text: "🔍 Truy vấn ngay",
+            url: "https://t.me/pay99_money_bot?start=open"
+          }
+        ]]
+      }
+    })
+  });
+}

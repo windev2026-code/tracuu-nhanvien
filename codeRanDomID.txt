@@ -1,0 +1,12 @@
+function taoID() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  for (let i = 2; i <= 101; i++) {
+    let id = "";
+    for (let j = 0; j < 5; j++) {
+      id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    sheet.getRange(i, 1).setValue(id);
+  }
+}
