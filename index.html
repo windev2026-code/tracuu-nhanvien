@@ -28,13 +28,9 @@
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #1a1a2e;
-      --surface: #242438;
-      --surface2: #1e1e30;
-      --border: rgba(255,255,255,0.08);
-      --text: #f0f0f8;
-      --text2: #9ca3af;
-      --text3: #6b7280;
+      --bg: #1a1a2e; --surface: #242438; --surface2: #1e1e30;
+      --border: rgba(255,255,255,0.08); --text: #f0f0f8;
+      --text2: #9ca3af; --text3: #6b7280;
       --blue-light: rgba(36,129,204,0.15);
       --green-light: rgba(15,158,110,0.15);
       --red-light: rgba(226,75,74,0.12);
@@ -42,11 +38,8 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; background: var(--bg); font-family: 'Be Vietnam Pro', sans-serif; color: var(--text); }
-
-  /* HEADER */
   .header {
-    background: var(--blue);
-    padding: 14px 16px 12px;
+    background: var(--blue); padding: 14px 16px 12px;
     display: flex; align-items: center; gap: 10px;
     position: sticky; top: 0; z-index: 10;
   }
@@ -58,8 +51,6 @@
   }
   .header-title { font-size: 15px; font-weight: 600; color: #fff; }
   .header-sub { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 1px; }
-
-  /* NAV */
   .nav {
     display: flex; background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -73,26 +64,18 @@
   }
   .nav-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
   .nav-icon { font-size: 18px; }
-
-  /* CONTENT */
   .content { padding: 16px; padding-bottom: 32px; }
   .screen { display: none; }
   .screen.active { display: block; }
-
-  /* SEARCH */
   .search-wrap {
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    display: flex; align-items: center;
-    padding: 10px 12px; gap: 8px;
-    margin-bottom: 14px;
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); display: flex; align-items: center;
+    padding: 10px 12px; gap: 8px; margin-bottom: 14px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   }
   .search-wrap input {
     flex: 1; border: none; background: none;
-    font-size: 15px; color: var(--text); outline: none;
-    font-family: inherit;
+    font-size: 15px; color: var(--text); outline: none; font-family: inherit;
   }
   .search-wrap input::placeholder { color: var(--text3); }
   .search-btn {
@@ -103,17 +86,29 @@
   }
   .search-btn:active { opacity: 0.8; }
 
-  /* RESULT CARD */
+  /* SAVED BADGE */
+  .saved-badge {
+    display: none; align-items: center; gap: 10px;
+    background: var(--blue-light); border: 1px solid var(--blue-mid);
+    border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px;
+  }
+  .saved-badge.show { display: flex; }
+  .saved-badge-id { font-size: 14px; font-weight: 600; color: var(--blue); flex: 1; }
+  .change-btn {
+    background: var(--blue); color: #fff; border: none;
+    border-radius: var(--radius-sm); padding: 6px 12px;
+    font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .change-btn:active { opacity: 0.8; }
+
   .result-card {
     background: var(--surface); border-radius: var(--radius);
-    border: 1px solid var(--border);
-    overflow: hidden;
+    border: 1px solid var(--border); overflow: hidden;
     box-shadow: 0 1px 6px rgba(0,0,0,0.05);
     display: none; animation: fadeIn 0.25s ease;
   }
   .result-card.show { display: block; }
   @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
-
   .result-top {
     background: linear-gradient(135deg, var(--blue) 0%, #1a6db5 100%);
     padding: 16px; display: flex; align-items: center; gap: 12px;
@@ -136,7 +131,6 @@
     font-size: 11px; color: #fff;
   }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
-
   .result-body { padding: 4px 0; }
   .result-row {
     display: flex; justify-content: space-between; align-items: center;
@@ -146,16 +140,9 @@
   .result-label { font-size: 13px; color: var(--text2); }
   .result-val { font-size: 13px; font-weight: 500; color: var(--text); }
   .result-val.green { color: var(--green); }
-
-  /* EMPTY */
-  .empty {
-    text-align: center; padding: 48px 20px;
-    color: var(--text3); font-size: 14px;
-  }
+  .empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 14px; }
   .empty-icon { font-size: 40px; margin-bottom: 10px; }
   .empty-hint { font-size: 12px; color: var(--text3); margin-top: 6px; }
-
-  /* ERROR */
   .error-box {
     background: var(--red-light); border: 1px solid rgba(226,75,74,0.2);
     border-radius: var(--radius); padding: 14px 16px; display: none;
@@ -163,8 +150,6 @@
   }
   .error-box.show { display: flex; align-items: center; gap: 10px; }
   .error-box span { font-size: 13px; color: var(--red); }
-
-  /* METRICS */
   .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
   .metric-card {
     background: var(--surface); border-radius: var(--radius);
@@ -176,25 +161,18 @@
   .metric-val { font-size: 18px; font-weight: 600; color: var(--text); }
   .metric-val.blue { color: var(--blue); }
   .metric-val.green { color: var(--green); }
-
-  .section-title {
-    font-size: 12px; font-weight: 600; color: var(--text2);
-    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;
-  }
+  .section-title { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
   .chart-wrap {
     background: var(--surface); border-radius: var(--radius);
     border: 1px solid var(--border); padding: 14px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     position: relative; height: 220px;
   }
-
-  /* HISTORY */
   .history-item {
     background: var(--surface); border-radius: var(--radius);
     border: 1px solid var(--border); padding: 13px 14px;
     margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    animation: fadeIn 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04); animation: fadeIn 0.2s ease;
   }
   .history-name { font-size: 14px; font-weight: 500; color: var(--text); }
   .history-date { font-size: 11px; color: var(--text3); margin-top: 3px; }
@@ -204,12 +182,7 @@
     border-radius: 20px; padding: 2px 8px;
     font-size: 11px; color: var(--green); margin-top: 4px;
   }
-
-  /* LOADING */
-  .loading {
-    display: none; text-align: center; padding: 32px;
-    color: var(--text2); font-size: 13px;
-  }
+  .loading { display: none; text-align: center; padding: 32px; color: var(--text2); font-size: 13px; }
   .loading.show { display: block; }
   .spinner {
     width: 28px; height: 28px; border: 3px solid var(--border);
@@ -225,7 +198,7 @@
   <div class="header-avatar">NB</div>
   <div>
     <div class="header-title">Truy vấn lương</div>
-      <div class="header-sub">--------------</div>
+    <div class="header-sub">--------------</div>
   </div>
 </div>
 
@@ -242,10 +215,17 @@
 </div>
 
 <div class="content">
-
-  <!-- TAB: TRA CỨU -->
   <div class="screen active" id="screen-lookup">
-    <div class="search-wrap">
+
+    <!-- Badge hiển thị khi đã lưu ID -->
+    <div class="saved-badge" id="savedBadge">
+      <span>🔖</span>
+      <span class="saved-badge-id" id="savedBadgeText">—</span>
+      <button class="change-btn" onclick="doiID()">Đổi ID</button>
+    </div>
+
+    <!-- Ô nhập ID -->
+    <div class="search-wrap" id="searchWrap">
       <input type="text" id="searchInput" placeholder="Nhập ID của bạn..." autocapitalize="characters" />
       <button class="search-btn" onclick="doSearch()">Tìm</button>
     </div>
@@ -254,12 +234,10 @@
       <div class="spinner"></div>
       Đang tra cứu...
     </div>
-
     <div class="error-box" id="errorBox">
       <span style="font-size:18px">❌</span>
       <span id="errorMsg">Không tìm thấy ID này.</span>
     </div>
-
     <div class="result-card" id="resultCard">
       <div class="result-top">
         <div class="result-avatar" id="resAvatar">NV</div>
@@ -288,7 +266,6 @@
         </div>
       </div>
     </div>
-
     <div class="empty" id="emptyState">
       <div class="empty-icon">🔍</div>
       <div>Nhập ID để tra cứu</div>
@@ -296,7 +273,6 @@
     </div>
   </div>
 
-  <!-- TAB: DASHBOARD -->
   <div class="screen" id="screen-dashboard">
     <div class="metric-grid">
       <div class="metric-card">
@@ -326,7 +302,6 @@
     </div>
   </div>
 
-  <!-- TAB: LỊCH SỬ -->
   <div class="screen" id="screen-history">
     <div class="section-title">Giao dịch gần đây</div>
     <div id="historyList">
@@ -337,15 +312,10 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════
-// ⚙️  CẤU HÌNH — chỉ sửa phần này
-// ═══════════════════════════════════════════════════
 const GAS_URL = "https://script.google.com/macros/s/AKfycbySB2saHgaUk8v1T9ERnpFt3zwy29a2gf_5SjZHCM2yZ2AtcH5ECnuM1vwnwYea_1J-/exec";
-// ═══════════════════════════════════════════════════
 
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
@@ -353,7 +323,31 @@ if (tg) { tg.ready(); tg.expand(); }
 let chart = null;
 let lastData = null;
 
-// ── Tab switching ────────────────────────────────
+// ── Khởi động ────────────────────────────────────
+window.addEventListener('load', function() {
+  const savedID = localStorage.getItem('userID');
+  if (savedID) {
+    document.getElementById('searchWrap').style.display = 'none';
+    document.getElementById('savedBadge').classList.add('show');
+    document.getElementById('savedBadgeText').textContent = 'ID: ' + savedID;
+    document.getElementById('searchInput').value = savedID;
+    doSearch();
+  }
+});
+
+// ── Đổi ID ───────────────────────────────────────
+function doiID() {
+  localStorage.removeItem('userID');
+  document.getElementById('searchWrap').style.display = 'flex';
+  document.getElementById('savedBadge').classList.remove('show');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('errorBox').classList.remove('show');
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('searchInput').focus();
+}
+
+// ── Tab switching ─────────────────────────────────
 function switchTab(tab, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -361,40 +355,51 @@ function switchTab(tab, btn) {
   btn.classList.add('active');
 }
 
-// ── Search ───────────────────────────────────────
-async function doSearch() {
+// ── Search JSONP ──────────────────────────────────
+function doSearch() {
   const id = document.getElementById('searchInput').value.trim();
   if (!id) return;
-
   showState('loading');
 
-  try {
-    const res = await fetch(`${GAS_URL}?id=${encodeURIComponent(id)}`);
-    const json = await res.json();
+  const callbackName = 'cb_' + Date.now();
+  const script = document.createElement('script');
 
+  window[callbackName] = function(json) {
+    delete window[callbackName];
+    if (document.body.contains(script)) document.body.removeChild(script);
     if (json.found) {
       lastData = json;
+      localStorage.setItem('userID', id);
+      document.getElementById('searchWrap').style.display = 'none';
+      document.getElementById('savedBadge').classList.add('show');
+      document.getElementById('savedBadgeText').textContent = 'ID: ' + id;
       renderResult(json);
       updateDashboard(json);
       updateHistory(json);
       showState('result');
     } else {
-      showState('error', json.message || `Không tìm thấy ID ${id}`);
+      showState('error', json.message || 'Không tìm thấy ID ' + id);
     }
-  } catch (err) {
+  };
+
+  script.onerror = function() {
+    delete window[callbackName];
+    if (document.body.contains(script)) document.body.removeChild(script);
     showState('error', 'Lỗi kết nối. Vui lòng thử lại.');
-  }
+  };
+
+  script.src = GAS_URL + '?id=' + encodeURIComponent(id) + '&callback=' + callbackName;
+  document.body.appendChild(script);
 }
 
 function showState(state, msg) {
   document.getElementById('loadingState').classList.toggle('show', state === 'loading');
   document.getElementById('resultCard').classList.toggle('show', state === 'result');
   document.getElementById('errorBox').classList.toggle('show', state === 'error');
-  document.getElementById('emptyState').style.display = state === 'empty' ? 'block' : 'none';
+  document.getElementById('emptyState').style.display = (state === 'empty' || state === 'init') ? 'block' : 'none';
   if (state === 'error') document.getElementById('errorMsg').textContent = msg || '';
 }
 
-// ── Render result card ───────────────────────────
 function renderResult(d) {
   const initials = d.name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase();
   document.getElementById('resAvatar').textContent = initials;
@@ -406,7 +411,6 @@ function renderResult(d) {
   document.getElementById('resLoi').textContent = '+' + fmtVND(d.loi_nhuan);
 }
 
-// ── Dashboard ────────────────────────────────────
 function updateDashboard(d) {
   document.getElementById('dbTong').textContent = fmtVND(d.tong_nhap);
   document.getElementById('dbLoi').textContent = fmtVND(d.loi_nhuan);
@@ -443,10 +447,8 @@ function updateDashboard(d) {
   });
 }
 
-// ── History ──────────────────────────────────────
 function updateHistory(d) {
-  const list = document.getElementById('historyList');
-  list.innerHTML = `
+  document.getElementById('historyList').innerHTML = `
     <div class="history-item">
       <div>
         <div class="history-name">${d.name}</div>
@@ -460,24 +462,16 @@ function updateHistory(d) {
   `;
 }
 
-// ── Helpers ──────────────────────────────────────
-function fmtVND(n) {
-  return Number(n).toLocaleString('vi-VN') + ' đ';
-}
-// function fmtPct(v) {
-//   const num = parseFloat(v);
-//   return (num < 1 ? (num * 100).toFixed(1) : num.toFixed(1)) + '%';
-// }
-  function fmtPct(v) {
-  return v;
-}
+function fmtVND(n) { return Number(n).toLocaleString('vi-VN') + ' đ'; }
+function fmtPct(v) { return v; }
 
-// ── Enter key ────────────────────────────────────
 document.getElementById('searchInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') doSearch();
 });
+document.getElementById('searchInput').addEventListener('input', function() {
+  this.value = this.value.toUpperCase();
+});
 
-// ── Telegram theme sync ──────────────────────────
 if (tg?.colorScheme === 'dark') {
   document.documentElement.style.setProperty('--bg', '#1a1a2e');
 }
